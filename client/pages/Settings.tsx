@@ -1,38 +1,41 @@
-import { useState } from 'react';
-import { Settings, Moon, Sun, Bell, Lock, LogOut, Eye, EyeOff, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Settings, Moon, Sun, Bell, Lock, LogOut, Save } from 'lucide-react';
 import { Card, CardHeader } from '@/components/Card';
 import { TopNav } from '@/components/TopNav';
 import { Sidebar } from '@/components/Sidebar';
+import { useTheme } from '@/context/ThemeContext';
+import { usePreferences } from '@/context/PreferencesContext';
 
 export default function SettingsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [preferences, setPreferences] = useState({
-    darkMode: false,
-    emailNotifications: true,
-    pushNotifications: true,
-    weeklyDigest: true,
-    dataBackup: true,
-    defaultView: 'dashboard' as 'dashboard' | 'today' | 'calendar',
-  });
-  const [profile, setProfile] = useState({
-    name: 'Alex Johnson',
-    email: 'alex@example.com',
-    bio: 'Goal setter and habit builder',
-    showPassword: false,
-  });
+  const { isDarkMode, setDarkMode } = useTheme();
+  const { preferences, profile, updatePreferences, updateProfile } = usePreferences();
+  const [localPreferences, setLocalPreferences] = useState(preferences);
+  const [localProfile, setLocalProfile] = useState(profile);
   const [saved, setSaved] = useState(false);
 
-  const handleToggle = (key: keyof typeof preferences) => {
-    setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
-    setSaved(false);
+  useEffect(() => {
+    setLocalPreferences(preferences);
+    setLocalProfile(profile);
+  }, [preferences, profile]);
+
+  const handleToggle = (key: keyof typeof localPreferences) => {
+    const newValue = !localPreferences[key];
+    setLocalPreferences(prev => ({ ...prev, [key]: newValue }));
+
+    // Immediately apply dark mode changes
+    if (key === 'darkMode') {
+      setDarkMode(newValue);
+    }
   };
 
   const handleProfileChange = (key: string, value: string) => {
-    setProfile(prev => ({ ...prev, [key]: value }));
-    setSaved(false);
+    setLocalProfile(prev => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
+    updatePreferences(localPreferences);
+    updateProfile(localProfile);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
