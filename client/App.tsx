@@ -5,10 +5,11 @@ import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { PreferencesProvider } from "./context/PreferencesContext";
 import { DataProvider } from "./context/DataContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Today from "./pages/Today";
@@ -17,35 +18,108 @@ import Notes from "./pages/Notes";
 import Habits from "./pages/Habits";
 import Archive from "./pages/Archive";
 import SettingsPage from "./pages/Settings";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
+// Protected Route Component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 const App = () => (
   <ThemeProvider>
-    <PreferencesProvider>
-      <DataProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/today" element={<Today />} />
-                <Route path="/goals" element={<Goals />} />
-                <Route path="/notes" element={<Notes />} />
-                <Route path="/habits" element={<Habits />} />
-                <Route path="/archive" element={<Archive />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </DataProvider>
-    </PreferencesProvider>
+    <AuthProvider>
+      <PreferencesProvider>
+        <DataProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/today"
+                    element={
+                      <ProtectedRoute>
+                        <Today />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/goals"
+                    element={
+                      <ProtectedRoute>
+                        <Goals />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/notes"
+                    element={
+                      <ProtectedRoute>
+                        <Notes />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/habits"
+                    element={
+                      <ProtectedRoute>
+                        <Habits />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/archive"
+                    element={
+                      <ProtectedRoute>
+                        <Archive />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <SettingsPage />
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </QueryClientProvider>
+        </DataProvider>
+      </PreferencesProvider>
+    </AuthProvider>
   </ThemeProvider>
 );
 
 createRoot(document.getElementById("root")!).render(<App />);
+

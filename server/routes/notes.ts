@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import { db, generateId } from "../db";
+import { getDb, generateId } from "../db";
 
 interface Note {
     id: string;
+    user_id: string;
     title: string | null;
     content: string;
     created_at: string;
@@ -10,12 +11,13 @@ interface Note {
     archived: boolean;
 }
 
-// GET all notes (non-archived)
+// GET all notes (non-archived) for current user
 export const getAllNotes: RequestHandler = (req, res) => {
     try {
-        const notes = db
-            .prepare("SELECT * FROM notes WHERE archived = 0 ORDER BY updated_at DESC")
-            .all() as Note[];
+        const userId = (req as any).userId;
+        const notes = getDb()
+            .prepare("SELECT * FROM notes WHERE user_id = ? AND archived = 0 ORDER BY updated_at DESC")
+            .all(userId) as Note[];
         res.json(notes);
     } catch (error) {
         console.error("Error fetching notes:", error);
@@ -27,7 +29,10 @@ export const getAllNotes: RequestHandler = (req, res) => {
 export const getNote: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
-        const note = db.prepare("SELECT * FROM notes WHERE id = ?").get(id) as Note;
+        const userId = (req as any).userId;
+        const note = getDb()
+            .prepare("SELECT * FROM notes WHERE id = ? AND user_id = ?")
+            .get(id, userId) as Note;
 
         if (!note) {
             return res.status(404).json({ error: "Note not found" });
@@ -44,19 +49,22 @@ export const getNote: RequestHandler = (req, res) => {
 export const createNote: RequestHandler = (req, res) => {
     try {
         const { title, content } = req.body;
+        const userId = (req as any).userId;
 
         if (!content || typeof content !== "string") {
             return res.status(400).json({ error: "Content is required" });
         }
 
         const id = generateId();
-        const stmt = db.prepare(
-            "INSERT INTO notes (id, title, content) VALUES (?, ?, ?)"
+        const stmt = getDb().prepare(
+            "INSERT INTO notes (id, user_id, title, content) VALUES (?, ?, ?, ?)"
         );
 
-        stmt.run(id, title || null, content);
+        stmt.run(id, userId, title || null, content);
 
-        const newNote = db.prepare("SELECT * FROM notes WHERE id = ?").get(id) as Note;
+        const newNote = getDb()
+            .prepare("SELECT * FROM notes WHERE id = ?")
+            .get(id) as Note;
         res.status(201).json(newNote);
     } catch (error) {
         console.error("Error creating note:", error);
@@ -69,6 +77,7 @@ export const updateNote: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
         const { title, content } = req.body;
+        const userId = (req as any).userId;
 
         const updates: string[] = [];
         const values: any[] = [];
@@ -88,10 +97,10 @@ export const updateNote: RequestHandler = (req, res) => {
         }
 
         updates.push("updated_at = CURRENT_TIMESTAMP");
-        values.push(id);
+        values.push(id, userId);
 
-        const stmt = db.prepare(
-            `UPDATE notes SET ${updates.join(", ")} WHERE id = ?`
+        const stmt = getDb().prepare(
+            `UPDATE notes SET ${updates.join(", ")} WHERE id = ? AND user_id = ?`
         );
 
         const result = stmt.run(...values);
@@ -100,7 +109,9 @@ export const updateNote: RequestHandler = (req, res) => {
             return res.status(404).json({ error: "Note not found" });
         }
 
-        const updatedNote = db.prepare("SELECT * FROM notes WHERE id = ?").get(id) as Note;
+        const updatedNote = getDb()
+            .prepare("SELECT * FROM notes WHERE id = ?")
+            .get(id) as Note;
         res.json(updatedNote);
     } catch (error) {
         console.error("Error updating note:", error);
@@ -112,12 +123,13 @@ export const updateNote: RequestHandler = (req, res) => {
 export const deleteNote: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
+        const userId = (req as any).userId;
 
-        const stmt = db.prepare(
-            "UPDATE notes SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        const stmt = getDb().prepare(
+            "UPDATE notes SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?"
         );
 
-        const result = stmt.run(id);
+        const result = stmt.run(id, userId);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: "Note not found" });
@@ -133,9 +145,10 @@ export const deleteNote: RequestHandler = (req, res) => {
 // GET archived notes
 export const getArchivedNotes: RequestHandler = (req, res) => {
     try {
-        const notes = db
-            .prepare("SELECT * FROM notes WHERE archived = 1 ORDER BY updated_at DESC")
-            .all() as Note[];
+        const userId = (req as any).userId;
+        const notes = getDb()
+            .prepare("SELECT * FROM notes WHERE user_id = ? AND archived = 1 ORDER BY updated_at DESC")
+            .all(userId) as Note[];
         res.json(notes);
     } catch (error) {
         console.error("Error fetching archived notes:", error);

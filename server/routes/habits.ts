@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import { db, generateId } from "../db";
+import { getDb, generateId } from "../db";
 
 interface Habit {
     id: string;
+    user_id: string;
     name: string;
     description: string | null;
     completed: boolean;
@@ -12,12 +13,13 @@ interface Habit {
     archived: boolean;
 }
 
-// GET all habits (non-archived)
+// GET all habits (non-archived) for current user
 export const getAllHabits: RequestHandler = (req, res) => {
     try {
-        const habits = db
-            .prepare("SELECT * FROM habits WHERE archived = 0 ORDER BY created_at DESC")
-            .all() as Habit[];
+        const userId = (req as any).userId;
+        const habits = getDb()
+            .prepare("SELECT * FROM habits WHERE user_id = ? AND archived = 0 ORDER BY created_at DESC")
+            .all(userId) as Habit[];
         res.json(habits);
     } catch (error) {
         console.error("Error fetching habits:", error);
@@ -29,19 +31,22 @@ export const getAllHabits: RequestHandler = (req, res) => {
 export const createHabit: RequestHandler = (req, res) => {
     try {
         const { name, description } = req.body;
+        const userId = (req as any).userId;
 
         if (!name || typeof name !== "string") {
             return res.status(400).json({ error: "Name is required" });
         }
 
         const id = generateId();
-        const stmt = db.prepare(
-            "INSERT INTO habits (id, name, description, completed, streak) VALUES (?, ?, ?, ?, ?)"
+        const stmt = getDb().prepare(
+            "INSERT INTO habits (id, user_id, name, description, completed, streak) VALUES (?, ?, ?, ?, ?, ?)"
         );
 
-        stmt.run(id, name, description || null, 0, 0);
+        stmt.run(id, userId, name, description || null, 0, 0);
 
-        const newHabit = db.prepare("SELECT * FROM habits WHERE id = ?").get(id) as Habit;
+        const newHabit = getDb()
+            .prepare("SELECT * FROM habits WHERE id = ?")
+            .get(id) as Habit;
         res.status(201).json(newHabit);
     } catch (error) {
         console.error("Error creating habit:", error);
@@ -54,6 +59,7 @@ export const updateHabit: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
         const { name, description, completed, streak } = req.body;
+        const userId = (req as any).userId;
 
         const updates: string[] = [];
         const values: any[] = [];
@@ -83,10 +89,10 @@ export const updateHabit: RequestHandler = (req, res) => {
         }
 
         updates.push("updated_at = CURRENT_TIMESTAMP");
-        values.push(id);
+        values.push(id, userId);
 
-        const stmt = db.prepare(
-            `UPDATE habits SET ${updates.join(", ")} WHERE id = ?`
+        const stmt = getDb().prepare(
+            `UPDATE habits SET ${updates.join(", ")} WHERE id = ? AND user_id = ?`
         );
 
         const result = stmt.run(...values);
@@ -95,7 +101,9 @@ export const updateHabit: RequestHandler = (req, res) => {
             return res.status(404).json({ error: "Habit not found" });
         }
 
-        const updatedHabit = db.prepare("SELECT * FROM habits WHERE id = ?").get(id) as Habit;
+        const updatedHabit = getDb()
+            .prepare("SELECT * FROM habits WHERE id = ?")
+            .get(id) as Habit;
         res.json(updatedHabit);
     } catch (error) {
         console.error("Error updating habit:", error);
@@ -107,12 +115,13 @@ export const updateHabit: RequestHandler = (req, res) => {
 export const deleteHabit: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
+        const userId = (req as any).userId;
 
-        const stmt = db.prepare(
-            "UPDATE habits SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        const stmt = getDb().prepare(
+            "UPDATE habits SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?"
         );
 
-        const result = stmt.run(id);
+        const result = stmt.run(id, userId);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: "Habit not found" });
@@ -129,37 +138,43 @@ export const deleteHabit: RequestHandler = (req, res) => {
 export const toggleHabitCompletion: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
+        const userId = (req as any).userId;
         const today = new Date().toISOString().split("T")[0];
 
         // Check if completion exists for today
-        const existing = db
-            .prepare("SELECT * FROM habit_completions WHERE habit_id = ? AND date = ?")
-            .get(id, today);
+        const existing = getDb()
+            .prepare("SELECT * FROM habit_completions WHERE habit_id = ? AND user_id = ? AND date = ?")
+            .get(id, userId, today);
 
         if (existing) {
             // Toggle completion
-            db.prepare(
-                "UPDATE habit_completions SET completed = NOT completed WHERE habit_id = ? AND date = ?"
-            ).run(id, today);
+            getDb()
+                .prepare(
+                    "UPDATE habit_completions SET completed = NOT completed WHERE habit_id = ? AND user_id = ? AND date = ?"
+                )
+                .run(id, userId, today);
         } else {
             // Create new completion
             const completionId = generateId();
-            db.prepare(
-                "INSERT INTO habit_completions (id, habit_id, date, completed) VALUES (?, ?, ?, ?)"
-            ).run(completionId, id, today, 1);
+            getDb()
+                .prepare(
+                    "INSERT INTO habit_completions (id, habit_id, user_id, date, completed) VALUES (?, ?, ?, ?, ?)"
+                )
+                .run(completionId, id, userId, today, 1);
         }
 
         // Update habit's completed status
-        const completion = db
-            .prepare("SELECT completed FROM habit_completions WHERE habit_id = ? AND date = ?")
-            .get(id, today) as { completed: number };
+        const completion = getDb()
+            .prepare("SELECT completed FROM habit_completions WHERE habit_id = ? AND user_id = ? AND date = ?")
+            .get(id, userId, today) as { completed: number } | undefined;
 
-        db.prepare("UPDATE habits SET completed = ? WHERE id = ?").run(
-            completion?.completed || 0,
-            id
-        );
+        getDb()
+            .prepare("UPDATE habits SET completed = ? WHERE id = ? AND user_id = ?")
+            .run(completion?.completed || 0, id, userId);
 
-        const updatedHabit = db.prepare("SELECT * FROM habits WHERE id = ?").get(id) as Habit;
+        const updatedHabit = getDb()
+            .prepare("SELECT * FROM habits WHERE id = ?")
+            .get(id) as Habit;
         res.json(updatedHabit);
     } catch (error) {
         console.error("Error toggling habit completion:", error);

@@ -7,9 +7,12 @@ async function fetchAPI<T>(
     endpoint: string,
     options?: RequestInit
 ): Promise<T> {
+    const token = localStorage.getItem("auth_token");
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
         headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...options?.headers,
         },
         ...options,

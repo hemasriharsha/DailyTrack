@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import { db, generateId } from "../db";
+import { getDb, generateId } from "../db";
 
 interface Goal {
     id: string;
+    user_id: string;
     text: string;
     completed: boolean;
     created_at: string;
@@ -10,12 +11,13 @@ interface Goal {
     archived: boolean;
 }
 
-// GET all goals (non-archived)
+// GET all goals (non-archived) for current user
 export const getAllGoals: RequestHandler = (req, res) => {
     try {
-        const goals = db
-            .prepare("SELECT * FROM goals WHERE archived = 0 ORDER BY created_at DESC")
-            .all() as Goal[];
+        const userId = (req as any).userId;
+        const goals = getDb()
+            .prepare("SELECT * FROM goals WHERE user_id = ? AND archived = 0 ORDER BY created_at DESC")
+            .all(userId) as Goal[];
         res.json(goals);
     } catch (error) {
         console.error("Error fetching goals:", error);
@@ -27,7 +29,10 @@ export const getAllGoals: RequestHandler = (req, res) => {
 export const getGoal: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
-        const goal = db.prepare("SELECT * FROM goals WHERE id = ?").get(id) as Goal;
+        const userId = (req as any).userId;
+        const goal = getDb()
+            .prepare("SELECT * FROM goals WHERE id = ? AND user_id = ?")
+            .get(id, userId) as Goal;
 
         if (!goal) {
             return res.status(404).json({ error: "Goal not found" });
@@ -44,19 +49,22 @@ export const getGoal: RequestHandler = (req, res) => {
 export const createGoal: RequestHandler = (req, res) => {
     try {
         const { text } = req.body;
+        const userId = (req as any).userId;
 
         if (!text || typeof text !== "string") {
             return res.status(400).json({ error: "Text is required" });
         }
 
         const id = generateId();
-        const stmt = db.prepare(
-            "INSERT INTO goals (id, text, completed) VALUES (?, ?, ?)"
+        const stmt = getDb().prepare(
+            "INSERT INTO goals (id, user_id, text, completed) VALUES (?, ?, ?, ?)"
         );
 
-        stmt.run(id, text, 0);
+        stmt.run(id, userId, text, 0);
 
-        const newGoal = db.prepare("SELECT * FROM goals WHERE id = ?").get(id) as Goal;
+        const newGoal = getDb()
+            .prepare("SELECT * FROM goals WHERE id = ?")
+            .get(id) as Goal;
         res.status(201).json(newGoal);
     } catch (error) {
         console.error("Error creating goal:", error);
@@ -69,6 +77,7 @@ export const updateGoal: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
         const { text, completed } = req.body;
+        const userId = (req as any).userId;
 
         const updates: string[] = [];
         const values: any[] = [];
@@ -88,10 +97,10 @@ export const updateGoal: RequestHandler = (req, res) => {
         }
 
         updates.push("updated_at = CURRENT_TIMESTAMP");
-        values.push(id);
+        values.push(id, userId);
 
-        const stmt = db.prepare(
-            `UPDATE goals SET ${updates.join(", ")} WHERE id = ?`
+        const stmt = getDb().prepare(
+            `UPDATE goals SET ${updates.join(", ")} WHERE id = ? AND user_id = ?`
         );
 
         const result = stmt.run(...values);
@@ -100,7 +109,9 @@ export const updateGoal: RequestHandler = (req, res) => {
             return res.status(404).json({ error: "Goal not found" });
         }
 
-        const updatedGoal = db.prepare("SELECT * FROM goals WHERE id = ?").get(id) as Goal;
+        const updatedGoal = getDb()
+            .prepare("SELECT * FROM goals WHERE id = ?")
+            .get(id) as Goal;
         res.json(updatedGoal);
     } catch (error) {
         console.error("Error updating goal:", error);
@@ -112,12 +123,13 @@ export const updateGoal: RequestHandler = (req, res) => {
 export const deleteGoal: RequestHandler = (req, res) => {
     try {
         const { id } = req.params;
+        const userId = (req as any).userId;
 
-        const stmt = db.prepare(
-            "UPDATE goals SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        const stmt = getDb().prepare(
+            "UPDATE goals SET archived = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?"
         );
 
-        const result = stmt.run(id);
+        const result = stmt.run(id, userId);
 
         if (result.changes === 0) {
             return res.status(404).json({ error: "Goal not found" });
@@ -133,9 +145,10 @@ export const deleteGoal: RequestHandler = (req, res) => {
 // GET archived goals
 export const getArchivedGoals: RequestHandler = (req, res) => {
     try {
-        const goals = db
-            .prepare("SELECT * FROM goals WHERE archived = 1 ORDER BY updated_at DESC")
-            .all() as Goal[];
+        const userId = (req as any).userId;
+        const goals = getDb()
+            .prepare("SELECT * FROM goals WHERE user_id = ? AND archived = 1 ORDER BY updated_at DESC")
+            .all(userId) as Goal[];
         res.json(goals);
     } catch (error) {
         console.error("Error fetching archived goals:", error);
