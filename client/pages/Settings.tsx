@@ -10,14 +10,14 @@ export default function SettingsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDarkMode, setDarkMode } = useTheme();
   const { preferences, profile, updatePreferences, updateProfile } = usePreferences();
-  const [localPreferences, setLocalPreferences] = useState(preferences);
+  const [localPreferences, setLocalPreferences] = useState({ ...preferences, darkMode: isDarkMode });
   const [localProfile, setLocalProfile] = useState(profile);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setLocalPreferences(preferences);
+    setLocalPreferences(prev => ({ ...prev, ...preferences, darkMode: isDarkMode }));
     setLocalProfile(profile);
-  }, [preferences, profile]);
+  }, [preferences, profile, isDarkMode]);
 
   const handleToggle = (key: keyof typeof localPreferences) => {
     const newValue = !localPreferences[key];
