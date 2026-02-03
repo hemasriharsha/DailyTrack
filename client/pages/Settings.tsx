@@ -170,19 +170,19 @@ export default function SettingsPage() {
               <SettingToggle
                 label="Email Notifications"
                 description="Receive email updates about your activities"
-                value={preferences.emailNotifications}
+                value={localPreferences.emailNotifications}
                 onChange={() => handleToggle('emailNotifications')}
               />
               <SettingToggle
                 label="Push Notifications"
                 description="Get push notifications for reminders and updates"
-                value={preferences.pushNotifications}
+                value={localPreferences.pushNotifications}
                 onChange={() => handleToggle('pushNotifications')}
               />
               <SettingToggle
                 label="Weekly Digest"
                 description="Receive a summary of your weekly progress"
-                value={preferences.weeklyDigest}
+                value={localPreferences.weeklyDigest}
                 onChange={() => handleToggle('weeklyDigest')}
               />
             </div>
@@ -195,7 +195,7 @@ export default function SettingsPage() {
               <SettingToggle
                 label="Auto-Backup"
                 description="Automatically backup your data daily"
-                value={preferences.dataBackup}
+                value={localPreferences.dataBackup}
                 onChange={() => handleToggle('dataBackup')}
               />
               <div className="py-4">
