@@ -93,7 +93,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-foreground mb-2">Name</label>
                 <input
                   type="text"
-                  value={profile.name}
+                  value={localProfile.name}
                   onChange={(e) => handleProfileChange('name', e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 />
@@ -102,7 +102,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-foreground mb-2">Email</label>
                 <input
                   type="email"
-                  value={profile.email}
+                  value={localProfile.email}
                   onChange={(e) => handleProfileChange('email', e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 />
@@ -110,7 +110,7 @@ export default function SettingsPage() {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Bio</label>
                 <textarea
-                  value={profile.bio}
+                  value={localProfile.bio}
                   onChange={(e) => handleProfileChange('bio', e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground resize-none"
                   rows={3}
