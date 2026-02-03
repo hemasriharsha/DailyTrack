@@ -1,36 +1,44 @@
-import { useState, useEffect } from 'react';
-import { Settings, Moon, Sun, Bell, Lock, LogOut, Save } from 'lucide-react';
-import { Card, CardHeader } from '@/components/Card';
-import { TopNav } from '@/components/TopNav';
-import { Sidebar } from '@/components/Sidebar';
-import { useTheme } from '@/context/ThemeContext';
-import { usePreferences } from '@/context/PreferencesContext';
+import { useState, useEffect } from "react";
+import { Settings, Moon, Sun, Bell, Lock, LogOut, Save } from "lucide-react";
+import { Card, CardHeader } from "@/components/Card";
+import { TopNav } from "@/components/TopNav";
+import { Sidebar } from "@/components/Sidebar";
+import { useTheme } from "@/context/ThemeContext";
+import { usePreferences } from "@/context/PreferencesContext";
 
 export default function SettingsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { isDarkMode, setDarkMode } = useTheme();
-  const { preferences, profile, updatePreferences, updateProfile } = usePreferences();
-  const [localPreferences, setLocalPreferences] = useState({ ...preferences, darkMode: isDarkMode });
+  const { preferences, profile, updatePreferences, updateProfile } =
+    usePreferences();
+  const [localPreferences, setLocalPreferences] = useState({
+    ...preferences,
+    darkMode: isDarkMode,
+  });
   const [localProfile, setLocalProfile] = useState(profile);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    setLocalPreferences(prev => ({ ...prev, ...preferences, darkMode: isDarkMode }));
+    setLocalPreferences((prev) => ({
+      ...prev,
+      ...preferences,
+      darkMode: isDarkMode,
+    }));
     setLocalProfile(profile);
   }, [preferences, profile, isDarkMode]);
 
   const handleToggle = (key: keyof typeof localPreferences) => {
     const newValue = !localPreferences[key];
-    setLocalPreferences(prev => ({ ...prev, [key]: newValue }));
+    setLocalPreferences((prev) => ({ ...prev, [key]: newValue }));
 
     // Immediately apply dark mode changes
-    if (key === 'darkMode') {
+    if (key === "darkMode") {
       setDarkMode(newValue);
     }
   };
 
   const handleProfileChange = (key: string, value: string) => {
-    setLocalProfile(prev => ({ ...prev, [key]: value }));
+    setLocalProfile((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
@@ -65,7 +73,7 @@ export default function SettingsPage() {
 
       <div
         className={`fixed top-16 transition-all duration-300 ${
-          sidebarCollapsed ? 'left-20' : 'left-64'
+          sidebarCollapsed ? "left-20" : "left-64"
         } right-0 bottom-0 overflow-y-auto`}
       >
         <div className="flex-1 p-8 max-w-3xl">
@@ -75,7 +83,9 @@ export default function SettingsPage() {
               <Settings size={36} />
               Settings
             </h1>
-            <p className="text-muted-foreground">Manage your preferences and account</p>
+            <p className="text-muted-foreground">
+              Manage your preferences and account
+            </p>
           </div>
 
           {/* Success Message */}
@@ -87,31 +97,40 @@ export default function SettingsPage() {
 
           {/* Profile Section */}
           <Card className="mb-6">
-            <CardHeader title="Profile" description="Manage your account information" />
+            <CardHeader
+              title="Profile"
+              description="Manage your account information"
+            />
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Name
+                </label>
                 <input
                   type="text"
                   value={localProfile.name}
-                  onChange={(e) => handleProfileChange('name', e.target.value)}
+                  onChange={(e) => handleProfileChange("name", e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Email</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Email
+                </label>
                 <input
                   type="email"
                   value={localProfile.email}
-                  onChange={(e) => handleProfileChange('email', e.target.value)}
+                  onChange={(e) => handleProfileChange("email", e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Bio</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Bio
+                </label>
                 <textarea
                   value={localProfile.bio}
-                  onChange={(e) => handleProfileChange('bio', e.target.value)}
+                  onChange={(e) => handleProfileChange("bio", e.target.value)}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground resize-none"
                   rows={3}
                 />
@@ -121,7 +140,10 @@ export default function SettingsPage() {
 
           {/* Display Preferences */}
           <Card className="mb-6">
-            <CardHeader title="Display" description="Customize how DailyTrack looks" />
+            <CardHeader
+              title="Display"
+              description="Customize how DailyTrack looks"
+            />
             <div className="divide-y divide-border">
               <div className="py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -133,7 +155,7 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-medium text-foreground">Dark Mode</h3>
                     <p className="text-sm text-muted-foreground">
-                      {isDarkMode ? 'Enabled' : 'Use light theme'}
+                      {isDarkMode ? "Enabled" : "Use light theme"}
                     </p>
                   </div>
                 </div>
@@ -141,7 +163,7 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={isDarkMode}
-                    onChange={() => handleToggle('darkMode')}
+                    onChange={() => handleToggle("darkMode")}
                     className="sr-only peer"
                   />
                   <div className="relative w-11 h-6 bg-secondary peer-checked:bg-accent rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
@@ -149,10 +171,17 @@ export default function SettingsPage() {
               </div>
 
               <div className="py-4">
-                <label className="block text-sm font-medium text-foreground mb-3">Default View</label>
+                <label className="block text-sm font-medium text-foreground mb-3">
+                  Default View
+                </label>
                 <select
                   value={localPreferences.defaultView}
-                  onChange={(e) => setLocalPreferences(prev => ({ ...prev, defaultView: e.target.value as any }))}
+                  onChange={(e) =>
+                    setLocalPreferences((prev) => ({
+                      ...prev,
+                      defaultView: e.target.value as any,
+                    }))
+                  }
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 >
                   <option value="dashboard">Dashboard</option>
@@ -165,38 +194,44 @@ export default function SettingsPage() {
 
           {/* Notifications */}
           <Card className="mb-6">
-            <CardHeader title="Notifications" description="Control how and when you get notified" />
+            <CardHeader
+              title="Notifications"
+              description="Control how and when you get notified"
+            />
             <div className="divide-y divide-border">
               <SettingToggle
                 label="Email Notifications"
                 description="Receive email updates about your activities"
                 value={localPreferences.emailNotifications}
-                onChange={() => handleToggle('emailNotifications')}
+                onChange={() => handleToggle("emailNotifications")}
               />
               <SettingToggle
                 label="Push Notifications"
                 description="Get push notifications for reminders and updates"
                 value={localPreferences.pushNotifications}
-                onChange={() => handleToggle('pushNotifications')}
+                onChange={() => handleToggle("pushNotifications")}
               />
               <SettingToggle
                 label="Weekly Digest"
                 description="Receive a summary of your weekly progress"
                 value={localPreferences.weeklyDigest}
-                onChange={() => handleToggle('weeklyDigest')}
+                onChange={() => handleToggle("weeklyDigest")}
               />
             </div>
           </Card>
 
           {/* Privacy & Data */}
           <Card className="mb-6">
-            <CardHeader title="Privacy & Data" description="Control your data and privacy settings" />
+            <CardHeader
+              title="Privacy & Data"
+              description="Control your data and privacy settings"
+            />
             <div className="divide-y divide-border">
               <SettingToggle
                 label="Auto-Backup"
                 description="Automatically backup your data daily"
                 value={localPreferences.dataBackup}
-                onChange={() => handleToggle('dataBackup')}
+                onChange={() => handleToggle("dataBackup")}
               />
               <div className="py-4">
                 <h3 className="font-medium text-foreground flex items-center gap-2 mb-3">
@@ -212,7 +247,10 @@ export default function SettingsPage() {
 
           {/* About */}
           <Card className="mb-6">
-            <CardHeader title="About" description="Information about DailyTrack" />
+            <CardHeader
+              title="About"
+              description="Information about DailyTrack"
+            />
             <div className="space-y-3">
               <div className="flex items-center justify-between py-3 border-b border-border">
                 <span className="text-foreground">App Version</span>
