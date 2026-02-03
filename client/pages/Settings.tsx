@@ -125,7 +125,7 @@ export default function SettingsPage() {
             <div className="divide-y divide-border">
               <div className="py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {preferences.darkMode ? (
+                  {isDarkMode ? (
                     <Moon size={20} className="text-accent" />
                   ) : (
                     <Sun size={20} className="text-yellow-500" />
@@ -133,14 +133,14 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-medium text-foreground">Dark Mode</h3>
                     <p className="text-sm text-muted-foreground">
-                      {preferences.darkMode ? 'Enabled' : 'Use light theme'}
+                      {isDarkMode ? 'Enabled' : 'Use light theme'}
                     </p>
                   </div>
                 </div>
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={preferences.darkMode}
+                    checked={isDarkMode}
                     onChange={() => handleToggle('darkMode')}
                     className="sr-only peer"
                   />
@@ -151,8 +151,8 @@ export default function SettingsPage() {
               <div className="py-4">
                 <label className="block text-sm font-medium text-foreground mb-3">Default View</label>
                 <select
-                  value={preferences.defaultView}
-                  onChange={(e) => setPreferences(prev => ({ ...prev, defaultView: e.target.value as any }))}
+                  value={localPreferences.defaultView}
+                  onChange={(e) => setLocalPreferences(prev => ({ ...prev, defaultView: e.target.value as any }))}
                   className="w-full px-4 py-2 bg-secondary border border-border rounded-lg outline-none focus:border-accent text-foreground"
                 >
                   <option value="dashboard">Dashboard</option>
