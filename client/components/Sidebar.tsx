@@ -1,16 +1,26 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, CheckSquare, BookOpen, Zap, Archive, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Calendar,
+  CheckSquare,
+  BookOpen,
+  Zap,
+  Archive,
+  Settings,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: Calendar, label: 'Today', path: '/today' },
-  { icon: CheckSquare, label: 'Daily Goals', path: '/goals' },
-  { icon: BookOpen, label: 'Notes', path: '/notes' },
-  { icon: Zap, label: 'Habit Tracker', path: '/habits' },
-  { icon: Archive, label: 'Archive', path: '/archive' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Calendar, label: "Today", path: "/today" },
+  { icon: CheckSquare, label: "Daily Goals", path: "/goals" },
+  { icon: BookOpen, label: "Notes", path: "/notes" },
+  { icon: Zap, label: "Habit Tracker", path: "/habits" },
+  { icon: Archive, label: "Archive", path: "/archive" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 interface SidebarProps {
@@ -31,8 +41,8 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-16 bottom-0 bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col',
-        isCollapsed ? 'w-20' : 'w-64'
+        "fixed left-0 top-16 bottom-0 bg-sidebar border-r border-sidebar-border transition-all duration-300 flex flex-col",
+        isCollapsed ? "w-20" : "w-64",
       )}
     >
       {/* Menu Items */}
@@ -46,10 +56,10 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
               key={item.path}
               to={item.path}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors whitespace-nowrap',
+                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors whitespace-nowrap",
                 isActive
-                  ? 'bg-sidebar-accent text-sidebar-primary font-medium'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                  ? "bg-sidebar-accent text-sidebar-primary font-medium"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent",
               )}
             >
               <Icon size={20} className="flex-shrink-0" />
@@ -64,7 +74,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
         <button
           onClick={handleToggle}
           className="w-full flex items-center justify-center p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-sidebar-foreground"
-          title={isCollapsed ? 'Expand' : 'Collapse'}
+          title={isCollapsed ? "Expand" : "Collapse"}
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>

@@ -1,4 +1,4 @@
-import { Clock, Target, Flame } from 'lucide-react';
+import { Clock, Target, Flame } from "lucide-react";
 
 interface RightPanelProps {
   completedGoals: number;
@@ -13,17 +13,22 @@ export function RightPanel({
   focusMinutes = 45,
   streakDays = 12,
 }: RightPanelProps) {
-  const progressPercent = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+  const progressPercent =
+    totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
 
   return (
     <aside className="w-64 bg-card border-l border-border p-6 space-y-6 overflow-y-auto hidden lg:flex lg:flex-col">
       {/* Daily Progress */}
       <div>
-        <h3 className="text-sm font-semibold text-foreground mb-4">Daily Progress</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-4">
+          Daily Progress
+        </h3>
         <div className="space-y-3">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Goals Completed</span>
+              <span className="text-sm text-muted-foreground">
+                Goals Completed
+              </span>
               <span className="text-sm font-semibold text-foreground">
                 {completedGoals}/{totalGoals}
               </span>
@@ -62,14 +67,18 @@ export function RightPanel({
           </div>
           <div>
             <p className="text-xs text-gray-600 font-medium">Current Streak</p>
-            <p className="text-2xl font-bold text-gray-900">{streakDays} days</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {streakDays} days
+            </p>
           </div>
         </div>
       </div>
 
       {/* Quick Stats */}
       <div className="space-y-2">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Stats</h4>
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Stats
+        </h4>
         <div className="space-y-2">
           <div className="flex items-center justify-between p-3 bg-secondary rounded-lg">
             <div className="flex items-center gap-2">

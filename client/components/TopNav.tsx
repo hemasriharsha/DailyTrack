@@ -1,5 +1,5 @@
-import { Search, Calendar, Bell, User } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Calendar, Bell, User } from "lucide-react";
+import { useState } from "react";
 
 export function TopNav() {
   const [searchFocus, setSearchFocus] = useState(false);
@@ -11,7 +11,9 @@ export function TopNav() {
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
           D
         </div>
-        <span className="text-lg font-semibold text-foreground">DailyTrack</span>
+        <span className="text-lg font-semibold text-foreground">
+          DailyTrack
+        </span>
       </div>
 
       {/* Search Bar */}
@@ -19,8 +21,8 @@ export function TopNav() {
         <div
           className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
             searchFocus
-              ? 'bg-white border-accent'
-              : 'bg-secondary border-border'
+              ? "bg-white border-accent"
+              : "bg-secondary border-border"
           }`}
         >
           <Search size={18} className="text-muted-foreground flex-shrink-0" />
@@ -36,14 +38,23 @@ export function TopNav() {
 
       {/* Right Icons */}
       <div className="flex items-center gap-4 flex-shrink-0">
-        <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground" title="Calendar">
+        <button
+          className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+          title="Calendar"
+        >
           <Calendar size={20} />
         </button>
-        <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground relative" title="Notifications">
+        <button
+          className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground relative"
+          title="Notifications"
+        >
           <Bell size={20} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        <button className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground" title="Profile">
+        <button
+          className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+          title="Profile"
+        >
           <User size={20} />
         </button>
       </div>

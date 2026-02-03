@@ -1,68 +1,100 @@
-import { useState } from 'react';
-import { Plus, X, Edit2, Calendar, Briefcase, Zap } from 'lucide-react';
-import { Card, CardHeader } from '@/components/Card';
-import { TopNav } from '@/components/TopNav';
-import { Sidebar } from '@/components/Sidebar';
-import { RightPanel } from '@/components/RightPanel';
+import { useState } from "react";
+import { Plus, X, Edit2, Calendar, Briefcase, Zap } from "lucide-react";
+import { Card, CardHeader } from "@/components/Card";
+import { TopNav } from "@/components/TopNav";
+import { Sidebar } from "@/components/Sidebar";
+import { RightPanel } from "@/components/RightPanel";
 
 interface Task {
   id: string;
   title: string;
-  category: 'work' | 'personal' | 'health';
+  category: "work" | "personal" | "health";
   completed: boolean;
   time?: string;
 }
 
 const getCategoryColor = (category: string) => {
   switch (category) {
-    case 'work':
-      return 'bg-blue-100 text-blue-700 border-blue-200';
-    case 'personal':
-      return 'bg-purple-100 text-purple-700 border-purple-200';
-    case 'health':
-      return 'bg-green-100 text-green-700 border-green-200';
+    case "work":
+      return "bg-blue-100 text-blue-700 border-blue-200";
+    case "personal":
+      return "bg-purple-100 text-purple-700 border-purple-200";
+    case "health":
+      return "bg-green-100 text-green-700 border-green-200";
     default:
-      return 'bg-gray-100 text-gray-700 border-gray-200';
+      return "bg-gray-100 text-gray-700 border-gray-200";
   }
 };
 
 const getCategoryLabel = (category: string) => {
   switch (category) {
-    case 'work':
-      return 'Work';
-    case 'personal':
-      return 'Personal';
-    case 'health':
-      return 'Health';
+    case "work":
+      return "Work";
+    case "personal":
+      return "Personal";
+    case "health":
+      return "Health";
     default:
-      return 'Other';
+      return "Other";
   }
 };
 
 export default function Today() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', title: 'Morning standup', category: 'work', completed: true, time: '09:00' },
-    { id: '2', title: 'Design review', category: 'work', completed: false, time: '10:30' },
-    { id: '3', title: 'Gym session', category: 'health', completed: false, time: '18:00' },
-    { id: '4', title: 'Team lunch', category: 'work', completed: false, time: '12:00' },
-    { id: '5', title: 'Call dentist', category: 'personal', completed: false, time: '14:00' },
+    {
+      id: "1",
+      title: "Morning standup",
+      category: "work",
+      completed: true,
+      time: "09:00",
+    },
+    {
+      id: "2",
+      title: "Design review",
+      category: "work",
+      completed: false,
+      time: "10:30",
+    },
+    {
+      id: "3",
+      title: "Gym session",
+      category: "health",
+      completed: false,
+      time: "18:00",
+    },
+    {
+      id: "4",
+      title: "Team lunch",
+      category: "work",
+      completed: false,
+      time: "12:00",
+    },
+    {
+      id: "5",
+      title: "Call dentist",
+      category: "personal",
+      completed: false,
+      time: "14:00",
+    },
   ]);
-  const [newTask, setNewTask] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'work' | 'personal' | 'health'>('work');
+  const [newTask, setNewTask] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<
+    "work" | "personal" | "health"
+  >("work");
 
   const today = new Date();
-  const formattedDate = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const formattedDate = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
-  const completedCount = tasks.filter(t => t.completed).length;
-  const workTasks = tasks.filter(t => t.category === 'work');
-  const personalTasks = tasks.filter(t => t.category === 'personal');
-  const healthTasks = tasks.filter(t => t.category === 'health');
+  const completedCount = tasks.filter((t) => t.completed).length;
+  const workTasks = tasks.filter((t) => t.category === "work");
+  const personalTasks = tasks.filter((t) => t.category === "personal");
+  const healthTasks = tasks.filter((t) => t.category === "health");
 
   const handleAddTask = () => {
     if (newTask.trim()) {
@@ -75,16 +107,18 @@ export default function Today() {
           completed: false,
         },
       ]);
-      setNewTask('');
+      setNewTask("");
     }
   };
 
   const handleToggleTask = (id: string) => {
-    setTasks(tasks.map(t => (t.id === id ? { ...t, completed: !t.completed } : t)));
+    setTasks(
+      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+    );
   };
 
   const handleDeleteTask = (id: string) => {
-    setTasks(tasks.filter(t => t.id !== id));
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
   const TaskItem = ({ task }: { task: Task }) => (
@@ -96,12 +130,18 @@ export default function Today() {
         className="w-5 h-5 rounded-md border border-border cursor-pointer"
       />
       <div className="flex-1">
-        <p className={`text-sm ${task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+        <p
+          className={`text-sm ${task.completed ? "line-through text-muted-foreground" : "text-foreground"}`}
+        >
           {task.title}
         </p>
-        {task.time && <p className="text-xs text-muted-foreground mt-1">{task.time}</p>}
+        {task.time && (
+          <p className="text-xs text-muted-foreground mt-1">{task.time}</p>
+        )}
       </div>
-      <span className={`text-xs font-medium px-2 py-1 rounded border ${getCategoryColor(task.category)}`}>
+      <span
+        className={`text-xs font-medium px-2 py-1 rounded border ${getCategoryColor(task.category)}`}
+      >
         {getCategoryLabel(task.category)}
       </span>
       <button
@@ -120,7 +160,7 @@ export default function Today() {
 
       <div
         className={`fixed top-16 transition-all duration-300 ${
-          sidebarCollapsed ? 'left-20' : 'left-64'
+          sidebarCollapsed ? "left-20" : "left-64"
         } right-0 bottom-0 overflow-y-auto`}
       >
         <div className="flex h-full">
@@ -140,7 +180,9 @@ export default function Today() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Work Tasks</p>
-                    <p className="text-2xl font-bold text-foreground">{workTasks.length}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {workTasks.length}
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -152,7 +194,9 @@ export default function Today() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Personal</p>
-                    <p className="text-2xl font-bold text-foreground">{personalTasks.length}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {personalTasks.length}
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -164,7 +208,9 @@ export default function Today() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Health</p>
-                    <p className="text-2xl font-bold text-foreground">{healthTasks.length}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {healthTasks.length}
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -177,7 +223,7 @@ export default function Today() {
                 description={`${completedCount} of ${tasks.length} completed`}
               />
               <div className="space-y-3">
-                {tasks.map(task => (
+                {tasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
                 ))}
 
@@ -186,7 +232,9 @@ export default function Today() {
                   <div className="flex gap-2 mb-3">
                     <select
                       value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value as any)}
+                      onChange={(e) =>
+                        setSelectedCategory(e.target.value as any)
+                      }
                       className="px-3 py-2 text-sm bg-secondary border border-border rounded-lg outline-none focus:border-accent"
                     >
                       <option value="work">Work</option>
@@ -200,7 +248,7 @@ export default function Today() {
                       type="text"
                       value={newTask}
                       onChange={(e) => setNewTask(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+                      onKeyPress={(e) => e.key === "Enter" && handleAddTask()}
                       placeholder="Add a new task..."
                       className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder-muted-foreground"
                     />
@@ -217,23 +265,36 @@ export default function Today() {
 
             {/* Timeline View */}
             <Card>
-              <CardHeader title="Timeline" description="Tasks organized by time" />
+              <CardHeader
+                title="Timeline"
+                description="Tasks organized by time"
+              />
               <div className="space-y-4">
                 {tasks
-                  .filter(t => t.time)
-                  .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
-                  .map(task => (
+                  .filter((t) => t.time)
+                  .sort((a, b) => (a.time || "").localeCompare(b.time || ""))
+                  .map((task) => (
                     <div key={task.id} className="flex gap-4">
                       <div className="w-16 flex-shrink-0">
-                        <p className="text-sm font-semibold text-foreground">{task.time}</p>
+                        <p className="text-sm font-semibold text-foreground">
+                          {task.time}
+                        </p>
                       </div>
                       <div className="flex-1 pb-4 border-l-2 border-border pl-4 relative">
                         <div className="absolute w-3 h-3 bg-accent rounded-full -left-[7px] top-1 mt-1"></div>
                         <div className="flex items-center justify-between">
-                          <span className={task.completed ? 'line-through text-muted-foreground' : 'text-foreground'}>
+                          <span
+                            className={
+                              task.completed
+                                ? "line-through text-muted-foreground"
+                                : "text-foreground"
+                            }
+                          >
                             {task.title}
                           </span>
-                          <span className={`text-xs font-medium px-2 py-1 rounded border ${getCategoryColor(task.category)}`}>
+                          <span
+                            className={`text-xs font-medium px-2 py-1 rounded border ${getCategoryColor(task.category)}`}
+                          >
                             {getCategoryLabel(task.category)}
                           </span>
                         </div>

@@ -5,11 +5,18 @@
 
 
 [functions]
-  external_node_modules = ["express"]
+  external_node_modules = ["express", "better-sqlite3"]
   node_bundler = "esbuild"
+  included_files = ["server/db/schema.sql"]
   
 [[redirects]]
   force = true
   from = "/api/*"
   status = 200
   to = "/.netlify/functions/api/:splat"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+

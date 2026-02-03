@@ -1,8 +1,8 @@
-import { TopNav } from '@/components/TopNav';
-import { Sidebar } from '@/components/Sidebar';
-import { Card } from '@/components/Card';
-import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { TopNav } from "@/components/TopNav";
+import { Sidebar } from "@/components/Sidebar";
+import { Card } from "@/components/Card";
+import { useState } from "react";
+import { ArrowRight } from "lucide-react";
 
 interface PlaceholderProps {
   title: string;
@@ -21,7 +21,7 @@ export function Placeholder({ title, icon, description }: PlaceholderProps) {
       {/* Main Content */}
       <div
         className={`fixed top-16 transition-all duration-300 ${
-          sidebarCollapsed ? 'left-20' : 'left-64'
+          sidebarCollapsed ? "left-20" : "left-64"
         } right-0 bottom-0 overflow-y-auto`}
       >
         <div className="flex h-full items-center justify-center p-8">
